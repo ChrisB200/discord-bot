@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        POETRY = "/home/pi/.local/bin/poetry"
+        POETRY = "/var/lib/jenkins/.local/bin/poetry"
     }
 
     stages {
