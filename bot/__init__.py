@@ -16,6 +16,8 @@ AUTOROLE_ID = 1453930078965600347
 
 @client.event
 async def on_member_join(member: discord.Member):
+    print(member)
+    print("hello")
     role = member.guild.get_role(AUTOROLE_ID)
     if role:
         await member.add_roles(role, reason="Autorole on join")
