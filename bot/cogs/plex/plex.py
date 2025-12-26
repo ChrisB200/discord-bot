@@ -89,7 +89,7 @@ class Plex(commands.Cog):
     async def anime_movies(self, ctx, *, series: str):
         await self._scrape(ctx, "anime-movies", series)
 
-    @plex.command(aliases=["tv", "show", "tv-shows", "shows"])
+    @plex.command(aliases=["show", "tv-shows", "shows"])
     async def tv(self, ctx, *, series: str):
         await self._scrape(ctx, "tv-shows", series)
 
