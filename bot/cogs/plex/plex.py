@@ -4,7 +4,7 @@ import re
 import discord
 from discord.ext import commands
 
-from ...scripts.torrent import add_magnet_link
+from ...scripts.torrent import add_magnet_link, get_progress
 from .scrapers.anime import NyaaScraper
 from .scrapers.knaben import Knaben
 from .views import PaginatorView
@@ -119,6 +119,24 @@ class Plex(commands.Cog):
             return await ctx.send("An error has occured")
 
         await ctx.send(f"Began downloading: {result.get('name')}")
+
+    @plex.command()
+    async def progress(self, ctx):
+        torrents = get_progress()
+        if not torrents:
+            return await ctx.send("Nothing is currently downloading")
+
+        description_lines = []
+        for t in torrents:
+            description_lines.append(f"{t[0]}: {t[1]}%")
+
+        embed = discord.Embed(
+            title="Download Progress",
+            description="\n".join(description_lines),
+            color=discord.Color.blurple(),
+        )
+
+        await ctx.send(embed=embed)
 
 
 async def setup(client):

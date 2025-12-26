@@ -17,3 +17,10 @@ except Exception as e:
 def add_magnet_link(magnet_link: str, category=None):
     qbt.torrents.add(urls=magnet_link, category=category)
     return "success"
+
+
+def get_progress():
+    torrents = []
+    for t in qbt.torrents_info():
+        torrents.append([t.name, t.progress * 100])
+    return torrents
