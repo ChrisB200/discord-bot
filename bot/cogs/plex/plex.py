@@ -63,13 +63,11 @@ class Plex(commands.Cog):
 
             embed = discord.Embed(
                 title=f"🔍 Results for '{series}'",
-                description="Use .download <number> to download\n\n".join(
-                    description_lines
-                ),
+                description="\n\n".join(description_lines),
                 color=discord.Color.blurple(),
             )
             embed.set_footer(
-                text=f"Page {len(pages)+1} / {math.ceil(len(rows)/chunk_size)}"
+                text=f"Use .download <number> to begin downloading\nPage {len(pages)+1} / {math.ceil(len(rows)/chunk_size)}"
             )
             pages.append(embed)
 
@@ -128,7 +126,7 @@ class Plex(commands.Cog):
 
         description_lines = []
         for t in torrents:
-            description_lines.append(f"{t[0]}: {t[1]}%")
+            description_lines.append(f"{t[0]}: **{round(float(t[1]))}%**")
 
         embed = discord.Embed(
             title="Download Progress",
