@@ -104,7 +104,7 @@ class Plex(commands.Cog):
         try:
             id = int(id) - 1
 
-            if id > len(last_results) - 1 or id <= 0:
+            if id > len(last_results) - 1 or id < 0:
                 return await ctx.send(f"Must be between 1 and {len(last_results)}")
 
             result = last_results[id]
