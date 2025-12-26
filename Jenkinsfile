@@ -9,7 +9,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                    rsync -av --delete \
+                    sudo rsync -av --delete \
                       --exclude .git \
                       --exclude .venv \
                       --exclude .env \
