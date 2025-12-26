@@ -15,7 +15,7 @@ prefix = "."
 if ENVIRONMENT in {"dev", "development"}:
     prefix = "!"
 
-client = commands.Bot(command_prefix="!", intents=intents)
+client = commands.Bot(command_prefix=prefix, intents=intents)
 
 AUTOROLE_ID = 1453930078965600347
 
