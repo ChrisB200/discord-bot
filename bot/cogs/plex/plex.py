@@ -116,7 +116,9 @@ class Plex(commands.Cog):
         except Exception:
             return await ctx.send("An error has occured")
 
-        await ctx.send(f"Began downloading: {result.get('name')}")
+        await ctx.send(
+            f"Began downloading: {result.get('name')}\n use .progress to check its progress"
+        )
 
     @plex.command()
     async def progress(self, ctx):
@@ -125,8 +127,8 @@ class Plex(commands.Cog):
             return await ctx.send("Nothing is currently downloading")
 
         description_lines = []
-        for t in torrents:
-            description_lines.append(f"{t[0]}: **{round(float(t[1]))}%**")
+        for i, t in enumerate(torrents):
+            description_lines.append(f"{i}. {t[0]}: **{round(float(t[1]))}%**")
 
         embed = discord.Embed(
             title="Download Progress",
