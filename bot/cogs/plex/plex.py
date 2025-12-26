@@ -4,7 +4,9 @@ import re
 import discord
 from discord.ext import commands
 
-from ...scripts.torrent import add_magnet_link, get_progress
+from scripts.redis import redis
+from scripts.torrent import add_magnet_link, get_magnet_hash, get_progress
+
 from .scrapers.anime import NyaaScraper
 from .scrapers.knaben import Knaben
 from .views import PaginatorView
@@ -134,13 +136,16 @@ class Plex(commands.Cog):
                 return await ctx.send(f"Must be between 1 and {len(last_results)}")
 
             result = last_results[id]
+            magnet = result.get("magnet")
+            user = self.last_results.get(ctx.author.id)
+            hash = get_magnet_hash(magnet)
+            media_type = user.get("type")
 
-            add_magnet_link(
-                result.get("magnet"), self.last_results.get(
-                    ctx.author.id)["type"]
-            )
-        except Exception:
-            return await ctx.send("An error has occured")
+            add_magnet_link(magnet, media_type)
+            redis.set(hash, ctx.author.id)
+        except Exception as e:
+            print(str(e))
+            return await ctx.send("An error has occurred")
 
         await ctx.send(
             f"Began downloading: {result.get('name')}\n use .progress to check its progress"

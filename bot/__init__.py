@@ -1,17 +1,28 @@
 import asyncio
 
 import discord
+from discord.client import Client
 from discord.ext import commands
 
+from scripts.config import ACCESS_TOKEN, ENVIRONMENT
+
 from .cogs import load_cogs
-from .scripts.config import ACCESS_TOKEN
 
 intents = discord.Intents.default()
 intents.message_content = True
 
-client = commands.Bot(command_prefix=".", intents=intents)
+prefix = "."
+if ENVIRONMENT in {"dev", "development"}:
+    prefix = "!"
+
+client = commands.Bot(command_prefix="!", intents=intents)
 
 AUTOROLE_ID = 1453930078965600347
+
+
+async def send_dm(user_id: int, message: str):
+    user = await client.fetch_user(user_id)
+    await user.send(message)
 
 
 @client.event
@@ -47,6 +58,6 @@ async def reload(ctx, extension):
     await client.load_extension(f"bot.cogs.{extension}.{extension}")
 
 
-def run():
+def run_bot():
     asyncio.run(load_cogs(client))
     client.run(ACCESS_TOKEN)
