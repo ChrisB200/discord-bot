@@ -11,13 +11,18 @@ routes = Blueprint("routes", __name__)
 def completed_torrent():
     hash = request.json.get("hash")
 
+    if not request.json:
+        return jsonify("Missing json"), 400
+
     if not hash:
         return jsonify("Missing hash"), 400
 
-    user_id = int(redis.get(hash))
+    user_id = redis.get(hash)
 
     if not user_id:
         return jsonify("Could not get user id from hash"), 400
+
+    user_id = int(user_id)
 
     torrent = get_torrent_by_hash(hash)
 
