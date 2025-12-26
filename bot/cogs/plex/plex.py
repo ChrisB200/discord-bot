@@ -33,8 +33,29 @@ class Plex(commands.Cog):
 
     @commands.group(invoke_without_command=True)
     async def plex(self, ctx):
-        """Base plex command"""
-        await ctx.send("Available subcommands: organise, test, etc.")
+        """Scrape and download media for Plex."""
+        await ctx.invoke(ctx.bot.get_command("help"), "plex")
+
+    @plex.command(name="help")
+    async def plex_help(self, ctx):
+        """Show help for Plex commands."""
+        embed = discord.Embed(
+            title="📺 Plex Commands",
+            color=discord.Color.blurple(),
+            description="Available subcommands:",
+        )
+
+        plex_cmd = ctx.bot.get_command("plex")
+
+        for cmd in plex_cmd.commands:
+            aliases = ", ".join(cmd.aliases) if cmd.aliases else "None"
+            embed.add_field(
+                name=f".plex {cmd.name}",
+                value=f"{cmd.help or 'No description'}\nAliases: `{aliases}`",
+                inline=False,
+            )
+
+        await ctx.send(embed=embed)
 
     async def _scrape(self, ctx, media_type: str, series: str):
         if media_type in {"anime", "anime-movie"}:
@@ -81,22 +102,27 @@ class Plex(commands.Cog):
 
     @plex.command(aliases=["a"])
     async def anime(self, ctx, *, series: str):
+        """Search for anime"""
         await self._scrape(ctx, "anime", series)
 
     @plex.command(aliases=["am", "anime-movie", "anime-movies"])
     async def anime_movies(self, ctx, *, series: str):
+        """Search for anime movies"""
         await self._scrape(ctx, "anime-movies", series)
 
     @plex.command(aliases=["show", "tv-shows", "shows"])
     async def tv(self, ctx, *, series: str):
+        """Search for tv shows"""
         await self._scrape(ctx, "tv-shows", series)
 
     @plex.command(aliases=["film", "films", "movie"])
     async def movies(self, ctx, *, series: str):
+        """Search for movies"""
         await self._scrape(ctx, "movies", series)
 
     @plex.command()
     async def download(self, ctx, *, id):
+        """Download a result by its number from the last search"""
         last_results = self.last_results.get(ctx.author.id)["rows"]
         if not last_results:
             return await ctx.send("Must search for a show, movie or anime first")
@@ -122,6 +148,7 @@ class Plex(commands.Cog):
 
     @plex.command()
     async def progress(self, ctx):
+        """Get the progress of all media currently downloading"""
         torrents = get_progress()
         if not torrents:
             return await ctx.send("Nothing is currently downloading")
