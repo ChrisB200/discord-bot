@@ -3,24 +3,24 @@ pipeline {
 
     environment {
         POETRY = "/home/pi/.local/bin/poetry"
-        APP_DIR = "/home/pi/code/discord-bot"
     }
 
     stages {
-        stage('Update code') {
+        stage('Install dependencies') {
             steps {
                 sh '''
-                    cd $APP_DIR
-                    git pull
+                    $POETRY install --no-interaction --no-ansi
                 '''
             }
         }
 
-        stage('Install dependencies') {
+        stage('Deploy') {
             steps {
                 sh '''
-                    cd $APP_DIR
-                    $POETRY install --no-interaction --no-ansi
+                    rsync -av --delete \
+                      --exclude .git \
+                      --exclude .venv \
+                      . /home/pi/code/discord-bot/
                 '''
             }
         }
