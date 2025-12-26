@@ -14,7 +14,7 @@ client = commands.Bot(command_prefix=".", intents=intents)
 AUTOROLE_ID = 1453930078965600347
 
 
-@commands.Cog.listener()
+@client.event()
 async def on_member_join(self, member: discord.Member):
     role = member.guild.get_role(AUTOROLE_ID)
     if role:
