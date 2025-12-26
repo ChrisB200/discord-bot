@@ -14,6 +14,9 @@ media_types = {
     "anime-movie": "anime-movies",
     "tv": "tv-shows",
     "movie": "movies",
+    "movies": "movies",
+    "tv-shows": "tv-shows",
+    "anime-movies": "anime-movies",
 }
 
 
@@ -37,8 +40,10 @@ class Plex(commands.Cog):
             await ctx.send("Incorrect media type")
 
         if "anime" in media_type:
+            print("scraping nyaa")
             rows = self.anime.scrape_nyaa(series)
         else:
+            print("scraping knaben")
             rows = self.knaben.search(series)
 
         if not rows:
