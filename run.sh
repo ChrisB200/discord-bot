@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-exec poetry run python main.py
+exec /home/pi/.local/bin/poetry run python main.py
