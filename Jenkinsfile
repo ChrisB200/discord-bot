@@ -6,14 +6,6 @@ pipeline {
     }
 
     stages {
-        stage('Install dependencies') {
-            steps {
-                sh '''
-                    $POETRY install --no-interaction --no-ansi
-                '''
-            }
-        }
-
         stage('Deploy') {
             steps {
                 sh '''
