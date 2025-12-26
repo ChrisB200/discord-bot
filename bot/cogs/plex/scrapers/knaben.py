@@ -28,6 +28,9 @@ class Knaben:
                 "hide_xxx": True,
             },
         )
+        if not res.json():
+            return None
+
         return self.filter_results(res.json())
 
     def filter_results(self, response: dict):
