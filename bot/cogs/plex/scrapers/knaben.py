@@ -1,4 +1,5 @@
 import requests
+from requests.exceptions import JSONDecodeError
 
 BASE_URL = "https://api.knaben.org/v1"
 
@@ -27,11 +28,28 @@ class Knaben:
                 "hide_unsafe": True,
                 "hide_xxx": True,
             },
+            timeout=10,
         )
-        if not res.json():
+
+        # 1️⃣ HTTP-level failure
+        if res.status_code != 200:
             return None
 
-        return self.filter_results(res.json())
+        # 2️⃣ Empty body
+        if not res.text:
+            return None
+
+        # 3️⃣ Invalid JSON
+        try:
+            data = res.json()
+        except JSONDecodeError:
+            return None
+
+        # 4️⃣ Empty or unexpected structure
+        if not data or "hits" not in data:
+            return None
+
+        return self.filter_results(data)
 
     def filter_results(self, response: dict):
         filtered_results = []
