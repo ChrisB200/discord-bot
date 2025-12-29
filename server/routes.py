@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify, request
 
-from bot import client, send_dm
-from scripts.redis import redis
-from scripts.torrent import get_torrent_by_hash
+from bot.client import client, send_dm
+from services.redis import redis
+from services.torrent import get_torrent_by_hash
 
 routes = Blueprint("routes", __name__)
 

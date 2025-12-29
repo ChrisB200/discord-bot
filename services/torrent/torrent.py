@@ -1,16 +1,6 @@
 import re
 
-import qbittorrentapi
-
-from .config import Q_HOST, Q_PASSWORD, Q_USERNAME
-
-qbt = qbittorrentapi.Client(
-    host=Q_HOST, username=Q_USERNAME, password=Q_PASSWORD)
-
-try:
-    qbt.auth_log_in()
-except Exception as e:
-    print("login failed", e)
+from .client import get_client
 
 
 def get_magnet_hash(magnet: str):
@@ -19,10 +9,12 @@ def get_magnet_hash(magnet: str):
 
 
 def add_magnet_link(magnet_link: str, category=None):
+    qbt = get_client()
     qbt.torrents.add(urls=magnet_link, category=category)
 
 
 def get_progress():
+    qbt = get_client()
     torrents = []
     for t in qbt.torrents_info():
         torrents.append([t.name, t.progress * 100])
@@ -30,5 +22,10 @@ def get_progress():
 
 
 def get_torrent_by_hash(hash: str):
+    qbt = get_client()
+
     for t in qbt.torrents_info():
-        return t if t.hash == hash else None
+        if t.hash == hash:
+            return t
+
+    return None

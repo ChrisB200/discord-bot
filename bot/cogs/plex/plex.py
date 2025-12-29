@@ -1,29 +1,17 @@
+import logging
 import math
 import re
 
 import discord
 from discord.ext import commands
 
-from scripts.redis import redis
-from scripts.torrent import add_magnet_link, get_magnet_hash, get_progress
+from services.redis import redis
+from services.torrent import add_magnet_link, get_magnet_hash, get_progress
 
-from .scrapers.anime import NyaaScraper
-from .scrapers.knaben import Knaben
+from .scrape import Knaben, NyaaScraper
 from .views import PaginatorView
 
-media_types = {
-    "anime": "anime",
-    "anime-movie": "anime-movies",
-    "tv": "tv-shows",
-    "film": "movies",
-    "films": "movies",
-    "shows": "tv-shows",
-    "show": "tv-shows",
-    "movie": "movies",
-    "movies": "movies",
-    "tv-shows": "tv-shows",
-    "anime-movies": "anime-movies",
-}
+logger = logging.getLogger(__name__)
 
 
 class Plex(commands.Cog):
@@ -60,10 +48,30 @@ class Plex(commands.Cog):
         await ctx.send(embed=embed)
 
     async def _scrape(self, ctx, media_type: str, series: str):
-        if media_type in {"anime", "anime-movie"}:
+        if media_type == "anime":
             rows = self.anime.scrape_nyaa(series)
-        else:
+            logger.info(
+                "Scraping anime from nyaa for %s by user %s", series, ctx.author.name
+            )
+        elif media_type == "anime-movies":
+            rows = self.anime.scrape_nyaa(series)
+            logger.info(
+                "Scraping anime movies from nyaa for %s by user %s",
+                series,
+                ctx.author.name,
+            )
+        elif media_type == "tv-shows":
             rows = self.knaben.search(series)
+            logger.info(
+                "Scraping tv from knaben for %s by user %s", series, ctx.author.name
+            )
+        elif media_type == "movies":
+            rows = self.knaben.search(series)
+            logger.info(
+                "Scraping movies from knaben for %s by user %s", series, ctx.author.name
+            )
+        else:
+            return await ctx.send("An error occurred with media type")
 
         if not rows or rows == []:
             await ctx.send(f"No results found for `{series}`.")
@@ -143,12 +151,12 @@ class Plex(commands.Cog):
 
             add_magnet_link(magnet, media_type)
             redis.set(hash, ctx.author.id)
-        except Exception as e:
-            print(str(e))
+        except Exception:
+            logger.exception("An error occurred trying to download")
             return await ctx.send("An error has occurred")
 
         await ctx.send(
-            f"Began downloading: {result.get('name')}\n use .progress to check its progress"
+            f"Began downloading: {result.get('name')}\n use .plex progress to check its progress"
         )
 
     @plex.command()
@@ -172,5 +180,4 @@ class Plex(commands.Cog):
 
 
 async def setup(client):
-    print("attempting to load plex cog")
     await client.add_cog(Plex(client))
