@@ -1,6 +1,7 @@
 import logging
 import math
 import re
+import shutil
 
 import discord
 from discord.ext import commands
@@ -14,6 +15,14 @@ from .views import PaginatorView
 logger = logging.getLogger(__name__)
 
 
+def pretty_size(num_bytes: int) -> str:
+    for unit in ["B", "KB", "MB", "GB", "TB", "PB"]:
+        if num_bytes < 1024:
+            return f"{num_bytes:.2f} {unit}"
+        num_bytes /= 1024
+    return f"{num_bytes:.2f} PB"
+
+
 class Plex(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -25,6 +34,33 @@ class Plex(commands.Cog):
     async def plex(self, ctx):
         """Scrape and download media for Plex."""
         await ctx.invoke(ctx.bot.get_command("help"), "plex")
+
+    @plex.command()
+    async def storage(self, ctx):
+        """Shows the storage information on the plex server"""
+        path = "/mnt/ssd"
+        try:
+            stats = shutil.disk_usage(path)
+        except FileNotFoundError:
+            return await ctx.send(f"❌ Path not found: `{path}`")
+
+        embed = discord.Embed(
+            title=f"📊 Storage Info for `{path}`",
+            color=discord.Color.blurple()
+        )
+
+        embed.add_field(name="Total", value=pretty_size(
+            stats.total), inline=True)
+        embed.add_field(name="Used", value=pretty_size(
+            stats.used), inline=True)
+        embed.add_field(name="Free", value=pretty_size(
+            stats.free), inline=True)
+
+        percent_used = (stats.used / stats.total * 100) if stats.total else 0
+        embed.add_field(
+            name="Used %", value=f"{percent_used:.1f}%", inline=True)
+
+        await ctx.send(embed=embed)
 
     @plex.command(name="help")
     async def plex_help(self, ctx):
