@@ -1,3 +1,6 @@
 #!/usr/bin/env bash
-/home/pi/.local/bin/poetry install
+set -e
+
+cd /home/pi/code/discord-bot
+
 exec /home/pi/.local/bin/poetry run python main.py
